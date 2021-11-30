@@ -1,0 +1,15 @@
+namespace com.linkedin.dataset
+
+/**
+ * Upstream lineage of a dataset
+ */
+@Aspect = {
+  "name": "upstreamLineage"
+}
+record UpstreamLineage {
+
+  /**
+   * List of upstream dataset lineage information
+   */
+  upstreams: array[Upstream]
+}

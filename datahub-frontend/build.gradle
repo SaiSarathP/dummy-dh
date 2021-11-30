@@ -1,0 +1,49 @@
+plugins {
+  id "io.github.kobylynskyi.graphql.codegen" version "4.1.1"
+}
+apply plugin: 'java'
+apply from: './play.gradle'
+
+
+model {
+  // Must specify the dependency here as "stage" is added by rule based model.
+  tasks.myTar {
+    dependsOn stage
+  }
+}
+
+task myTar(type: Tar) {
+  extension = "tgz"
+  compression = Compression.GZIP
+
+  from("${buildDir}/stage")
+
+  into("bin") {
+    from("bin")
+  }
+
+  into("conf") {
+    from("conf")
+    fileMode = 0600
+  }
+}
+
+artifacts {
+  archives myTar
+}
+
+graphqlCodegen {
+  // For options: https://github.com/kobylynskyi/graphql-java-codegen/blob/master/docs/codegen-options.md
+  graphqlSchemaPaths = ["$projectDir/conf/datahub-frontend.graphql".toString()]
+  outputDir = new File("$projectDir/app/graphql")
+  packageName = "generated"
+  generateApis = true
+  modelValidationAnnotation = ""
+  customTypesMapping = [
+          Long: "Long",
+  ]
+}
+
+tasks.withType(Checkstyle) {
+  exclude "**/generated/**"
+}

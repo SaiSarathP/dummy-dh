@@ -1,0 +1,49 @@
+name: This repo fetches changes everytime there is a commit on the parent repo (linkedin/datahub), then build and publish the docs in 
+      this repo.
+on:
+  push: #Uses the push event, so that the jobs run every time someone pushes a change to the rep
+    branches:
+      - master
+    paths: 
+      .github/workflows/documentation.yml
+  release:
+    types: [published, edited]
+      
+    # Allows you to run this workflow manually from the Actions tab.
+  workflow_dispatch:
+
+jobs:
+  gh-pages:
+    runs-on: ubuntu-latest #Configures the job to run on an Ubuntu Linux runner
+    steps:
+      - uses: actions/checkout@v2 #Checks out the repo and downloads it to the runner, to run actions against the code.
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1 
+        with:
+          java-version: 1.8
+          fetch-depth: 0 #Number of commits to fetch. 0 indicates all history for all branches and tags.
+      
+
+    # Create publish workflow for every commit that is picked up
+      - name: Update mirror branch to match upstream master
+        run: |
+          git config --global user.email "saisarath.punnamaraju@gslab.com"
+          git config --global user.name "Sai Sarath"
+          git checkout master
+          CUR_HEAD=$(git rev-parse HEAD)
+          echo "Current head at ${CUR_HEAD}"
+          git remote add upstream https://github.com/SaiSarathP/dummy-dh.git
+          git fetch upstream master
+          for commit in $(git rev-list $CUR_HEAD..upstream/master --reverse); do
+              echo $commit
+              git rebase $commit
+              git push origin master
+              git checkout master
+              git cherry-pick $commit
+              git push origin master
+              git checkout master
+          done
+          - name: Build Docs
+          run: |    #The run keyword tells the job to execute a command on the runner
+          sudo apt-get update     
+          ./gradlew --info docs-website:build

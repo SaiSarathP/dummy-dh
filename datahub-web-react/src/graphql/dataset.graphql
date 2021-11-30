@@ -1,0 +1,142 @@
+query getDataProfiles($urn: String!, $limit: Int, $startTime: Long, $endTime: Long) {
+    dataset(urn: $urn) {
+        urn
+        datasetProfiles(limit: $limit, startTimeMillis: $startTime, endTimeMillis: $endTime) {
+            rowCount
+            columnCount
+            timestampMillis
+            fieldProfiles {
+                fieldPath
+                uniqueCount
+                uniqueProportion
+                nullCount
+                nullProportion
+                min
+                max
+                mean
+                median
+                stdev
+                sampleValues
+            }
+        }
+    }
+}
+
+query getDataset($urn: String!) {
+    dataset(urn: $urn) {
+        ...nonRecursiveDatasetFields
+        schemaMetadata(version: 0) {
+            ...schemaMetadataFields
+        }
+        previousSchemaMetadata: schemaMetadata(version: -1) {
+            ...schemaMetadataFields
+        }
+        editableSchemaMetadata {
+            editableSchemaFieldInfo {
+                fieldPath
+                description
+                globalTags {
+                    ...globalTagsFields
+                }
+                glossaryTerms {
+                    ...glossaryTerms
+                }
+            }
+        }
+        deprecation {
+            actor
+            deprecated
+            note
+            decommissionTime
+        }
+        globalTags {
+            ...globalTagsFields
+        }
+        glossaryTerms {
+            ...glossaryTerms
+        }
+        subTypes {
+            typeNames
+        }
+        usageStats(resource: $urn, range: MONTH) {
+            buckets {
+                bucket
+                duration
+                resource
+                metrics {
+                    uniqueUserCount
+                    totalSqlQueries
+                    topSqlQueries
+                }
+            }
+            aggregations {
+                uniqueUserCount
+                totalSqlQueries
+                users {
+                    user {
+                        urn
+                        username
+                    }
+                    count
+                    userEmail
+                }
+                fields {
+                    fieldName
+                    count
+                }
+            }
+        }
+        datasetProfiles(limit: 1) {
+            rowCount
+            columnCount
+            timestampMillis
+            fieldProfiles {
+                fieldPath
+                uniqueCount
+                uniqueProportion
+                nullCount
+                nullProportion
+                min
+                max
+                mean
+                median
+                stdev
+                sampleValues
+            }
+        }
+        incoming: relationships(
+            input: { types: ["DownstreamOf", "Consumes", "Produces"], direction: INCOMING, start: 0, count: 100 }
+        ) {
+            ...fullRelationshipResults
+        }
+        outgoing: relationships(
+            input: { types: ["DownstreamOf", "Consumes", "Produces"], direction: OUTGOING, start: 0, count: 100 }
+        ) {
+            ...fullRelationshipResults
+        }
+        ...viewProperties
+        autoRenderAspects: aspects(input: { autoRenderOnly: true }) {
+            aspectName
+            payload
+            renderSpec {
+                displayType
+                displayName
+                key
+            }
+        }
+    }
+}
+
+mutation updateDataset($urn: String!, $input: DatasetUpdateInput!) {
+    updateDataset(urn: $urn, input: $input) {
+        urn
+    }
+}
+
+fragment viewProperties on Dataset {
+    viewProperties {
+        materialized
+        logic
+        language
+    }
+}

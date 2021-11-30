@@ -1,0 +1,68 @@
+query getChart($urn: String!) {
+    chart(urn: $urn) {
+        urn
+        type
+        tool
+        chartId
+        properties {
+            name
+            description
+            externalUrl
+            type
+            access
+            lastRefreshed
+            lastModified {
+                time
+            }
+            created {
+                time
+            }
+            customProperties {
+                key
+                value
+            }
+        }
+        query {
+            rawQuery
+            type
+        }
+        ownership {
+            ...ownershipFields
+        }
+        globalTags {
+            ...globalTagsFields
+        }
+        editableProperties {
+            description
+        }
+        institutionalMemory {
+            elements {
+                url
+                author {
+                    urn
+                    username
+                }
+                label
+                created {
+                    time
+                    actor
+                }
+            }
+        }
+        glossaryTerms {
+            ...glossaryTerms
+        }
+        inputs: relationships(input: { types: ["Consumes"], direction: OUTGOING, start: 0, count: 100 }) {
+            ...fullRelationshipResults
+        }
+        dashboards: relationships(input: { types: ["Contains"], direction: INCOMING, start: 0, count: 100 }) {
+            ...fullRelationshipResults
+        }
+    }
+}
+
+mutation updateChart($urn: String!, $input: ChartUpdateInput!) {
+    updateChart(urn: $urn, input: $input) {
+        urn
+    }
+}

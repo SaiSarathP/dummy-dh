@@ -1,0 +1,19 @@
+apply plugin: 'java'
+apply plugin: 'pegasus'
+
+dependencies {
+    compile spec.product.pegasus.data
+
+    dataModel externalDependency.gmaCoreModels
+
+    testCompile externalDependency.assertJ
+}
+
+idea {
+    module {
+        sourceDirs += file('src/main/javaPegasus')
+    }
+}
+
+// Need to compile backing java definitions with the data template.
+sourceSets.mainGeneratedDataTemplate.java.srcDirs('src/main/javaPegasus/')
