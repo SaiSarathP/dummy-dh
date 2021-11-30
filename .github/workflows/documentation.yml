@@ -1,7 +1,7 @@
 name: This repo fetches changes everytime there is a commit on the parent repo (linkedin/datahub), then build and publish the docs in 
       this repo.
 on:
-  push: #Uses the push event, so that the jobs run every time someone pushes a change to the rep
+  push: #Uses the push event, so that the jobs run every time someone pushes a change to the rep...
     branches:
       - master
     paths: 
